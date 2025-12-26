@@ -107,15 +107,24 @@
             pointer-events: none;
             background-image: url('darkthemeflower.png');
             filter: blur(75px);
+            animation: pulse 5s infinite ease-in-out;
         }
         .flower-1 { top: 80px; left: 20px; }
         .flower-2 { top: 80px; right: 20px; }
         .flower-3 { bottom: 2px; left: 20px; }
         .flower-4 { bottom: 2px; right: 20px; }
-        .flower-5 { top: 55%; left: 300px; transform: translateY(-50%); }
-        .flower-6 { top: 55%; right: 300px; transform: translateY(-50%); }
+        .flower-5 { top: 55%; left: 300px; transform: translateY(-50%); animation-name: pulse-centered; }
+        .flower-6 { top: 55%; right: 300px; transform: translateY(-50%); animation-name: pulse-centered; }
         body.dark-theme .corner-flower {
             background-image: url('lightthemeflower.png');
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        @keyframes pulse-centered {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.2); }
         }
 
         @media (max-width: 768px) {
