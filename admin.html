@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy It - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; padding: 20px; background: #f4f4f4; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { margin-top: 0; color: #333; }
+        label{display: block;}
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; }
+        .btn { padding: 10px 20px; background: #ff4444; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .btn:hover { background: darkred; }
+        pre { background: #222; color: #0f0; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 300px; }
+        .refresh-btn { background: cyan; color: black; margin-left: 10px; }
+        .refresh-btn:hover { background: #009688; }
+        .user-item { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+        .chat-log { margin-top: 10px; padding: 10px; background: #f9f9f9; border: 1px solid #eee; border-radius: 5px; }
+        .user-search { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        .question { font-weight: bold; color: #1e88e5; margin-bottom: 5px; }
+
+        .answer { color: #333; margin-bottom: 10px; }
+        .user-details { padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; background: #fff; }
+        .chat-item { margin-bottom: 15px; }
+        .log-title { font-size: 1.1em; font-weight: bold; color: #00796b; margin-bottom: 5px; }
+        .user-info-box p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Admin Panel</h1>          
+            <div>
+                <button class="btn refresh-btn" onclick="loadData()">Refresh Data</button>
+                <a href="index.html" style="margin-left: 10px; text-decoration: none; color: #333;">Home</a>
+            </div>
+        </div>
+
+        <div class="admin-login" style="margin-bottom: 20px;">
+            <label for="adminPassword">Admin Password:</label>
+            <input type="password" id="adminPassword" name="adminPassword">
+        </div>
+
+        <h2>Manage Data</h2>
+        <button class="btn" onclick="deleteAllChats()">Delete All Chats</button>
+
+
+
+
+        <h2>Registered Users</h2>        
+        <input type="text" id="user-search" class="user-search" placeholder="Search Users by Name or Email" oninput="filterUsers()">
+        <div id="users-display">Loading...</div>        
+
+
+    <script>
+        // Define API URL
+
+        const API_URL = "http://127.0.0.1:3000/api";
+        // Load data function
+        async function loadData() {
+            try {
+                const usersRes = await fetch(`${API_URL}/users`);
+                const users = await usersRes.json();
+                window.allUsers = users; // Store users globally
+
+                let usersHtml = '';
+                users.forEach(user => {
+
+                    const identifier = user.email || user.phone;
+                    usersHtml += `<div class="user-item"><strong>${user.fullname}</strong> (${identifier}) 
+                        <button onclick="toggleUserDetails('${identifier}')">Show Details</button>
+                        <div id="details-${identifier}" class="chat-log" style="display:none;"></div>
+                    </div>`;
+
+                });
+                document.getElementById('users-display').innerHTML = usersHtml || 'No users found.';
+            } catch (err) {
+                document.getElementById('users-display').textContent = "Error connecting to server.";
+            }
+        }
+
+        // Show User Details Function
+        async function toggleUserDetails(identifier) {
+            const container = document.getElementById(`details-${identifier}`);
+            if (container.style.display === 'none') {
+                 const user = window.allUsers.find(u => (u.email === identifier || u.phone === identifier));
+                 
+                 const chatsRes = await fetch(`${API_URL}/all-chats`);
+                const allChats = await chatsRes.json();
+                 const userChats = allChats[identifier] || [];
+        
+                let html = `
+                    <div class="user-info-box" style="margin-bottom: 15px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px;">
+                        <p><strong>Full Name:</strong> ${user.fullname}</p>
+                        <p><strong>Email:</strong> ${user.email || 'N/A'}</p>
+                        <p><strong>Phone:</strong> ${user.phone || 'N/A'}</p>
+                        <p><strong>Password:</strong> ${user.password}</p>
+                        <p><strong>Member Since:</strong> ${user.date ? new Date(user.date).toLocaleString() : 'N/A'}</p>
+                        <p><strong>User ID:</strong> ${user.id}</p>
+
+                    </div>
+                    <button class="btn" style="background: #ff4444; margin-bottom: 15px;" onclick="deleteUser('${identifier}')">Delete User</button>
+                    <h3>Chat History</h3>
+                `;
+
+                if (userChats.length === 0) {
+                    html += '<p>No chats found.</p>';
+                } else {
+                userChats.forEach((chat, index) => {
+                    html += `<div class="chat-item"><span class="log-title">Chat ${index + 1} (${chat.topic || 'No Topic'}):</span>`;
+                    chat.messages.forEach(msg => {
+                         if (msg.role === 'user') {
+                              html += `<p class="question">Q: ${msg.content}</p>`;
+                         } else if (msg.role === 'assistant') {
+                              html += `<p class="answer">A: ${msg.content}</p>`;
+                         }
+                    });
+                    html += '</div>';
+                });
+                }
+
+                container.innerHTML = html;
+
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        async function deleteAllChats() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            if (confirm("Are you sure you want to delete ALL chats for ALL users? This cannot be undone.")) {
+                await fetch(`${API_URL}/delete-chats`, { method: 'POST' });
+                loadData();
+            }
+        }
+
+        async function deleteUser(identifier) {
+            if(confirm("Are you sure you want to delete this user and their chats?")) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+                await fetch(`${API_URL}/delete-user`, {
+
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier })
+                });
+                loadData();
+            }
+        }
+
+         // Filter Users Function
+         function filterUsers() {
+
+              const searchTerm = document.getElementById('user-search').value.toLowerCase();
+              const userItems = document.querySelectorAll('.user-item');
+
+              userItems.forEach(item => {
+                   const text = item.textContent.toLowerCase();
+                   if (text.includes(searchTerm)) {
+                        item.style.display = '';
+                   } else {
+                        item.style.display = 'none';
+                   }
+              });
+         }
+
+
+        loadData();
+    </script>
+</body>
+</html>

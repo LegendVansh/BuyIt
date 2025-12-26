@@ -212,6 +212,18 @@
             }
         }
 
+        function updateNavUser() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                const displayName = user.fname || "User";
+                const accountLink = document.querySelector('a[href="account.html"]');
+                if (accountLink) {
+                    accountLink.textContent = "Hi " + displayName;
+                }
+            }
+        }
+        updateNavUser();
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {

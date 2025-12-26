@@ -162,9 +162,17 @@
             .floating-quote {
                 display: none;
             }
+            .search-box {
+                width: 100% !important;
+            }
             .search-box input {
-                width: 100%;
+                width: 100% !important;
                 margin-bottom: 10px;
+            }
+            .search-box button {
+                position: static !important;
+                width: 100%;
+                margin-left: 0 !important;
             }
         }
         /* AI Search Styles */
@@ -174,15 +182,24 @@
             position: relative;
             z-index: 1;
         }
+        .search-box {
+            position: relative;
+            width: 50%;
+            margin: 0 auto;
+        }
         .search-box input {
             padding: 15px;
-            width: 50%;
+            width: 100%;
+            box-sizing: border-box;
             border-radius: 30px;
             border: 2px solid #ccc;
             font-size: 1rem;
             outline: none;
         }
         .search-box button {
+            position: absolute;
+            left: 100%;
+            top: 0;
             padding: 15px 30px;
             margin-left: 10px;
             background: cyan;
@@ -192,6 +209,7 @@
             font-weight: bold;
             font-size: 1rem;
             transition: transform 0.2s;
+            white-space: nowrap;
         }
         .search-box button:hover {
             transform: scale(1.05);
@@ -222,8 +240,171 @@
             background-color: navy;
             color: white;
         }
-        body.dark-theme #close-btn {
-            filter: invert(1);
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid #000;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        body.dark-theme .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #fff;
+        }
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background-color: #f8f9fa;
+            padding-top: 160px; /* Space for header */
+            padding-left: 10px;
+            padding-right: 10px;
+            border-right: 1px solid #dee2e6;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        .sidebar.closed {
+            transform: translateX(-100%);
+        }
+        body.dark-theme .sidebar {
+            background-color: #121212;
+            border-right: 1px solid #333;
+        }
+        .product-search {
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+        .product-search.full-width {
+            margin-left: 0;
+        }
+        .new-chat-btn {
+            width: 100%;
+            padding: 10px;
+            background: cyan;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        body.dark-theme .new-chat-btn {
+            background: navy;
+            color: white;
+        }
+        .chat-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        body.dark-theme .chat-item {
+            background: #1e1e1e;
+            color: white;
+        }
+        .chat-item:hover, .chat-item.active {
+            background: #e9ecef;
+        }
+        body.dark-theme .chat-item:hover, body.dark-theme .chat-item.active {
+            background: #333;
+        }
+        .chat-topic {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+            font-size: 0.9rem;
+        }
+        .chat-options {
+            padding: 0 5px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        .chat-options:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        .options-menu {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1001;
+            width: 120px;
+            text-align: left;
+        }
+        body.dark-theme .options-menu {
+            background: #222;
+            border-color: #444;
+        }
+        .options-menu.show {
+            display: block;
+        }
+        .menu-item {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .menu-item:hover {
+            background: #f0f0f0;
+        }
+        body.dark-theme .menu-item:hover {
+            background: #444;
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .product-search { margin-left: 0; }
+        }
+        .close-sidebar-btn {
+            position: absolute; top: 125px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: inherit; z-index: 1002;
+        }
+        body.dark-theme .close-sidebar-btn { color: white; }
+        .sidebar-toggle-btn {
+            position: absolute; top: 20px; left: 20px; font-size: 1.5rem; background: transparent; border: none; cursor: pointer; display: none; color: black; z-index: 10;
+        }
+        body.dark-theme .sidebar-toggle-btn { color: white; }
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            background-color: black;
+            height: 1em;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+            animation: blink 1s step-end infinite;
+        }
+        body.dark-theme .cursor { background-color: white; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .product-search h1 {
+            transition: all 0.5s ease;
+            max-height: 3em;
+            opacity: 1;
+            overflow: hidden;
+        }
+        .product-search.search-active {
+            padding-top: 2rem;
+        }
+        .product-search.search-active h1 {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -249,13 +430,19 @@
         </nav>
     </header>
 
+    <div class="sidebar" id="sidebar">
+        <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+        <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
+        <div id="chat-list"></div>
+    </div>
+
     <section class="product-search">
-        <h1 style="margin-bottom: 1rem;">AI Product Search</h1>
+        <button id="open-sidebar-btn" class="sidebar-toggle-btn" onclick="toggleSidebar()">☰</button>
+        <h1 id="typing-header" style="margin-bottom: 1rem; min-height: 1.6em;"><span id="typing-text"></span><span class="cursor"></span></h1>
         <div class="search-box">
             <input type="text" id="product-input" placeholder="Ask anything or enter a product URL...">
-            <button onclick="searchProduct()">Search</button>
+            <button id="search-btn" onclick="searchProduct()">Search</button>
         </div>
-        <img src="crossicon.png" id="close-btn" onclick="closeResults()" alt="Close" style="display:none; margin-top: 20px; width: 40px; cursor: pointer;">
         <div id="search-results" class="results-container" style="display:none;"></div>
     </section>
 
@@ -278,8 +465,75 @@
             }
         }
 
+        function updateNavUser() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                const displayName = user.fname || "User";
+                const accountLink = document.querySelector('a[href="account.html"]');
+                if (accountLink) {
+                    accountLink.textContent = "Hi " + displayName;
+                }
+            }
+        }
+        updateNavUser();
+
+        // Typewriter Animation
+        const typingText = document.getElementById('typing-text');
+        const userForAnim = JSON.parse(localStorage.getItem('currentUser'));
+        const firstNameAnim = userForAnim && userForAnim.fname ? userForAnim.fname : "User";
+        
+        const typeTexts = [
+            { text: "What's on Agenda Today?", delay: 5000 },
+            { text: "Buy It Chatbot", delay: 5000 },
+            { text: "Welcome " + firstNameAnim, delay: 10000 }
+        ];
+        
+        let textIdx = 0;
+        let charIdx = 0;
+        let isDeleting = false;
+        let typeTimeout;
+
+        function typeWriter() {
+            const current = typeTexts[textIdx];
+            const fullText = current.text;
+            const searchSection = document.querySelector('.product-search');
+
+            if (searchSection.classList.contains('search-active')) return;
+
+            if (isDeleting) {
+                typingText.textContent = fullText.substring(0, charIdx - 1);
+                charIdx--;
+            } else {
+                typingText.textContent = fullText.substring(0, charIdx + 1);
+                charIdx++;
+            }
+
+            let typeSpeed = 100;
+            if (isDeleting) typeSpeed /= 2;
+
+            if (!isDeleting && charIdx === fullText.length) {
+                typeSpeed = current.delay;
+                isDeleting = true;
+            } else if (isDeleting && charIdx === 0) {
+                isDeleting = false;
+                textIdx = (textIdx + 1) % typeTexts.length;
+                typeSpeed = 500;
+            }
+
+            typeTimeout = setTimeout(typeWriter, typeSpeed);
+        }
+        typeWriter();
+
         const searchInput = document.getElementById('product-input');
         const quotes = document.querySelectorAll('.floating-quote');
+
+        quotes.forEach(q => {
+            q.addEventListener('animationend', () => {
+                q.style.opacity = '1';
+                q.style.transform = 'translateY(0)';
+                q.style.animation = 'none';
+            });
+        });
 
         searchInput.addEventListener('focus', () => {
             quotes.forEach(q => q.classList.add('slide-out'));
@@ -287,6 +541,146 @@
         searchInput.addEventListener('blur', () => {
             quotes.forEach(q => q.classList.remove('slide-out'));
         });
+
+        let chatHistory = [];
+        let stickyModel = null;
+        let chats = [];
+        let activeChatId = null;
+
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const storageKey = currentUser ? `buyit_chats_${currentUser.email}` : 'buyit_chats_guest';
+
+        function loadChats() {
+            const stored = localStorage.getItem(storageKey);
+            if (stored) {
+                chats = JSON.parse(stored);
+                renderSidebar();
+            }
+        }
+
+        function saveChats() {
+            localStorage.setItem(storageKey, JSON.stringify(chats));
+            renderSidebar();
+
+            // Sync chats to server
+            const userIdentifier = currentUser ? (currentUser.email || currentUser.phone) : 'guest';
+            fetch("http://127.0.0.1:3000/api/sync-chats", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ identifier: userIdentifier, chats: chats })
+            }).catch(err => console.error("Chat sync failed:", err));
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById('chat-list');
+            list.innerHTML = '';
+            chats.slice().reverse().forEach(chat => {
+                const div = document.createElement('div');
+                div.className = `chat-item ${chat.id === activeChatId ? 'active' : ''}`;
+                div.onclick = (e) => {
+                    if (!e.target.closest('.chat-options') && !e.target.closest('.options-menu')) {
+                        loadChat(chat.id);
+                    }
+                };
+                div.innerHTML = `
+                    <div class="chat-topic">${chat.topic}</div>
+                    <div class="chat-options" onclick="toggleMenu('${chat.id}')">⋮</div>
+                    <div id="menu-${chat.id}" class="options-menu">
+                        <div class="menu-item" onclick="showChatInfo('${chat.id}')">Info</div>
+                        <div class="menu-item" onclick="renameChat('${chat.id}')">Rename</div>
+                        <div class="menu-item" onclick="deleteChat('${chat.id}')">Delete</div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        window.toggleMenu = function(id) {
+            const menu = document.getElementById('menu-' + id);
+            document.querySelectorAll('.options-menu').forEach(m => {
+                if (m.id !== 'menu-' + id) m.classList.remove('show');
+            });
+            menu.classList.toggle('show');
+        };
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.chat-options')) {
+                document.querySelectorAll('.options-menu').forEach(m => m.classList.remove('show'));
+            }
+        });
+
+        window.loadChat = function(id) {
+            const chat = chats.find(c => c.id === id);
+            if (!chat) return;
+            activeChatId = id;
+            chatHistory = chat.messages || [];
+            stickyModel = chat.stickyModel || null;
+            
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'block';
+            quotes.forEach(q => q.classList.add('slide-out'));
+            document.querySelector('.product-search').classList.add('search-active');
+            
+            // Re-render messages
+            chatHistory.forEach(msg => {
+                if (msg.role === 'user') {
+                    const userDiv = document.createElement('div');
+                    userDiv.style.marginTop = "15px";
+                    userDiv.style.fontWeight = "bold";
+                    userDiv.textContent = "You: " + msg.content;
+                    resultsDiv.appendChild(userDiv);
+                } else if (msg.role === 'assistant') {
+                    const aiDiv = document.createElement('div');
+                    aiDiv.style.marginTop = "5px";
+                    aiDiv.style.marginBottom = "15px";
+                    aiDiv.innerHTML = msg.content.replace(/\n/g, "<br>");
+                    resultsDiv.appendChild(aiDiv);
+                }
+            });
+            renderSidebar();
+        };
+
+        window.startNewChat = function() {
+            activeChatId = null;
+            chatHistory = [];
+            stickyModel = null;
+            document.getElementById('search-results').style.display = 'none';
+            quotes.forEach(q => q.classList.remove('slide-out'));
+            document.querySelector('.product-search').classList.remove('search-active');
+            document.getElementById('product-input').value = '';
+            renderSidebar();
+            clearTimeout(typeTimeout);
+            typeWriter();
+        };
+
+        window.renameChat = function(id) {
+            const chat = chats.find(c => c.id === id);
+            if (chat) {
+                const newName = prompt("Enter new topic name:", chat.topic);
+                if (newName) {
+                    chat.topic = newName;
+                    saveChats();
+                }
+            }
+        };
+
+        window.deleteChat = function(id) {
+            if (confirm("Delete this chat?")) {
+                chats = chats.filter(c => c.id !== id);
+                saveChats();
+                if (activeChatId === id) startNewChat();
+            }
+        };
+
+        window.showChatInfo = function(id) {
+            const chat = chats.find(c => c.id === id);
+            if (chat) {
+                alert("Created on: " + new Date(chat.created).toLocaleString());
+            }
+        };
+
+        loadChats();
 
         // Allow pressing "Enter" to search
         document.getElementById("product-input").addEventListener("keypress", function(event) {
@@ -298,30 +692,151 @@
         async function searchProduct() {
             const inputField = document.getElementById('product-input');
             const input = inputField.value;
-            const apiKey = "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";
+            const apiKey = "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";
             const resultsDiv = document.getElementById('search-results');
-            const closeBtn = document.getElementById('close-btn');
+            const searchBtn = document.getElementById('search-btn');
+
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const firstName = user && user.fname ? user.fname : "User";
+            const lastName = user && user.lname ? user.lname : "";
             
             if (!input.trim()) return;
 
             inputField.value = "";
+            clearTimeout(typeTimeout);
+
+            const originalBtnText = searchBtn.innerHTML;
+            searchBtn.innerHTML = '<div class="spinner"></div>';
+            searchBtn.disabled = true;
 
             resultsDiv.style.display = "block";
-            closeBtn.style.display = "inline-block";
-            resultsDiv.innerHTML = "Thinking...";
-            quotes.forEach(q => q.style.display = 'none');
+            quotes.forEach(q => q.classList.add('slide-out'));
+            document.querySelector('.product-search').classList.add('search-active');
+
+            if (chatHistory.length === 0) {
+                resultsDiv.innerHTML = "";
+                chatHistory.push({
+                    "role": "system",
+                    "content": `
+You are Buy It, a fast and helpful AI assistant for an e-commerce price comparison platform.
+
+The user's name is ${firstName} ${lastName}. Address them by their first name (${firstName}) when appropriate.
+IMPORTANT: Treat the current user as a customer. Do not assume they are the creator (Gurvansh Singh) or related to any background figures, even if their name matches.
+
+Core behavior rules (STRICT):
+
+1. DEFAULT BEHAVIOR — PRODUCT LOOKUP ONLY
+- If the user provides ONLY a product name (e.g., "Acer laptop", "Nike shoes"):
+  • Identify and describe that product or brand only
+  • Provide estimated price ranges in INR
+  • Provide example buying links for the SAME brand/product
+  • DO NOT suggest other brands or cheaper alternatives
+  • DO NOT compare unless explicitly asked
+
+2. COMPARISON BEHAVIOR — ONLY WHEN TRIGGERED
+- Suggest cheaper or alternative products ONLY if:
+  • The user explicitly asks for cheaper options, alternatives, comparison, or savings
+  • OR the user provides a direct product URL
+
+3. URL-BASED INPUT (AUTO-COMPARISON)
+- If a product URL is provided:
+  • Infer product details from the URL text and context
+  • Automatically find and suggest cheaper or equivalent alternatives
+  • Alternatives may include other brands
+  • Provide estimated prices mainly in INR
+  • Include example clickable links from common marketplaces (Amazon, Flipkart, Myntra, Ajio, etc.)
+
+Additional rules:
+- Clothing, fashion, footwear, and innerwear are standard retail products and must be handled normally
+- Do not mention browsing, searching, data limitations, or model switching
+- Do not include creator or institutional details unless explicitly asked
+- Keep responses concise, practical, and focused on helping users save money
+
+Background information (mention ONLY if relevant or asked):
+- Gurjot Singh is the brother of Gurvansh Singh and owns a Toy Centre
+- Jagmeet Singh is the brother of Gurvansh Singh, owns a PlayStation 4, and is intelligent
+`
+                });
+                
+                // Create new chat session if not active
+                if (!activeChatId) {
+                    activeChatId = Date.now().toString();
+                    chats.push({
+                        id: activeChatId,
+                        topic: input,
+                        created: new Date().toISOString(),
+                        messages: chatHistory,
+                        stickyModel: null
+                    });
+                    saveChats();
+                }
+            }
+
+            chatHistory.push({"role": "user", "content": input});
+
+            const userDiv = document.createElement('div');
+            userDiv.style.marginTop = "15px";
+            userDiv.style.fontWeight = "bold";
+            userDiv.textContent = "You: " + input;
+            resultsDiv.appendChild(userDiv);
+
+            const aiDiv = document.createElement('div');
+            aiDiv.style.marginTop = "5px";
+            aiDiv.style.marginBottom = "15px";
+            aiDiv.innerHTML = "Thinking...";
+            resultsDiv.appendChild(aiDiv);
 
             const models = [
                 "google/gemini-2.0-flash-exp:free",
-                "openai/gpt-4o-mini",
-                "meta-llama/llama-3.3-70b-instruct:free",
-                "openrouter/auto"
+"google/gemini-1.5-flash:free",
+"google/gemma-3-27b-it:free",
+"google/gemma-2-9b-it:free",
+"google/gemma-2-2b-it:free",
+
+"meta-llama/llama-3.3-70b-instruct:free",
+"meta-llama/llama-3.1-70b-instruct:free",
+"meta-llama/llama-3.1-8b-instruct:free",
+"meta-llama/llama-3-8b-instruct:free",
+"meta-llama/llama-2-13b-chat:free",
+"meta-llama/llama-2-7b-chat:free",
+
+"openai/gpt-oss-120b:free",
+"openai/gpt-oss-20b:free",
+
+"qwen/qwen3-coder:free",
+"qwen/qwen2.5-72b-instruct:free",
+"qwen/qwen2.5-32b-instruct:free",
+"qwen/qwen2.5-14b-instruct:free",
+"qwen/qwen2.5-7b-instruct:free",
+"qwen/qwen-7b-chat:free",
+
+"mistralai/mistral-7b-instruct:free",
+"mistralai/mixtral-8x7b-instruct:free",
+"mistralai/mixtral-8x22b-instruct:free",
+
+"nousresearch/nous-hermes-2-mixtral:free",
+"nousresearch/nous-hermes-2-yi-34b:free",
+
+"openchat/openchat-3.5:free",
+"gryphe/mythomax-l2-13b:free",
+
+"tiiuae/falcon-7b-instruct:free",
+"tiiuae/falcon-11b-instruct:free",
+
+"huggingfaceh4/zephyr-7b-beta:free",
+"openrouter/auto"
             ];
 
-            for (let i = 0; i < models.length; i++) {
-                const model = models[i];
+            let candidates = models;
+            if (stickyModel) {
+                candidates = [stickyModel, ...models.filter(m => m !== stickyModel)];
+                candidates = [stickyModel];
+            }
+
+            for (let i = 0; i < candidates.length; i++) {
+                const model = candidates[i];
                 try {
-                    if (i > 0) resultsDiv.innerHTML = `Model busy, switching to ${model}...`;
+                    if (i > 0) aiDiv.innerHTML = `Model busy, switching to ${model}...`;
 
                     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                         method: "POST",
@@ -334,14 +849,13 @@
                         body: JSON.stringify({
                             "model": model,
                             "messages": [
-                                {"role": "system", "content": "You are a helpful AI assistant for Buy It. You can engage in normal conversation. If the user provides a product URL or name, your task is to find cheaper alternatives and also provide url of the alternative product. IMPORTANT: when user provides url, search the url and then tell about your cheaper alternative options. Then, list cheaper alternatives and prices based on your knowledge. Do not say you cannot browse. Just provide the best recommendations you can. You are made by Gurvansh Singh (a high school student) under the guidance of principal maam (Harpreet Kaur). You have to provide clickable links and try giving faster responses. Dont mention who made you if not asked. "},
-                                {"role": "user", "content": input}
+                                ...chatHistory
                             ]
                         })
                     });
 
                     if (!response.ok) {
-                        if (i === models.length - 1) {
+                        if (i === candidates.length - 1) {
                             const errorText = await response.text();
                             throw new Error(`API Error (${response.status}): ${errorText}`);
                         }
@@ -350,26 +864,50 @@
 
                     const data = await response.json();
                     if(data.choices && data.choices.length > 0) {
-                        resultsDiv.innerHTML = data.choices[0].message.content.replace(/\n/g, "<br>");
+                        stickyModel = model;
+                        const responseMessage = data.choices[0].message;
+                        chatHistory.push(responseMessage);
+                        
+                        // Update chat in storage
+                        const currentChat = chats.find(c => c.id === activeChatId);
+                        if (currentChat) {
+                            currentChat.messages = chatHistory;
+                            currentChat.stickyModel = stickyModel;
+                            saveChats();
+                        }
+
+                        aiDiv.innerHTML = responseMessage.content.replace(/\n/g, "<br>");
+                        searchBtn.innerHTML = originalBtnText;
+                        searchBtn.disabled = false;
                         return;
                     } else {
-                        if (i === models.length - 1) {
-                            resultsDiv.innerHTML = "No results found.";
+                        if (i === candidates.length - 1) {
+                            aiDiv.innerHTML = "No results found.";
                         }
                     }
                 } catch (error) {
                     console.error("Fetch Error:", error);
-                    if (i === models.length - 1) {
-                        resultsDiv.innerHTML = `<strong>Fetch Error:</strong><br><pre>${error.toString()}</pre>`;
+                    if (i === candidates.length - 1) {
+                        aiDiv.innerHTML = `<strong>Fetch Error:</strong><br><pre>${error.toString()}</pre>`;
                     }
                 }
             }
+            
+            chatHistory.pop();
+            searchBtn.innerHTML = originalBtnText;
+            searchBtn.disabled = false;
         }
 
-    function closeResults() {
-        document.getElementById('search-results').style.display = 'none';
-        document.getElementById('close-btn').style.display = 'none';
-        quotes.forEach(q => q.style.display = '');
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.product-search');
+        const openBtn = document.getElementById('open-sidebar-btn');
+        
+        sidebar.classList.toggle('closed');
+        mainContent.classList.toggle('full-width');
+        
+        // Show open button only when sidebar is closed
+        openBtn.style.display = sidebar.classList.contains('closed') ? 'block' : 'none';
     }
     </script>
 </body>

@@ -169,12 +169,14 @@
         .btn-primary { background: cyan; color: black; }
         .btn-secondary { background: #ccc; color: black; }
         .btn-outline { background: transparent; border: 2px solid cyan; color: black; width: 100%; margin-top: 10px; }
+        .btn-danger { background: #ff4444; color: white; width: 100%; margin-top: 10px; }
         
         body.dark-theme .form-box { background: rgba(30, 30, 30, 0.9); color: white; }
         body.dark-theme .input-group input { background: #444; border-color: #555; color: white; }
         body.dark-theme .btn-primary { background: navy; color: white; }
         body.dark-theme .btn-secondary { background: #555; color: white; }
         body.dark-theme .btn-outline { border-color: navy; color: white; }
+        body.dark-theme .btn-danger { background: darkred; }
     </style>
 </head>
 <body>
@@ -197,6 +199,20 @@
     </header>
 
     <section class="account-container">
+        <!-- Server Status Indicator -->
+        <div id="server-status" style="position: absolute; top: 0; left: 0; width: 100%; background: #ff4444; color: white; text-align: center; padding: 10px; display: none; z-index: 10;">
+            <strong>Server Offline:</strong> Please run <code>node server.js</code> in your terminal.
+        </div>
+
+        <!-- Dashboard (Logged In) -->
+        <div class="form-box" id="dashboard-box" style="display: none;">
+            <h2 id="dashboard-welcome">Welcome</h2>
+            <p id="dashboard-date" style="font-size: 0.9rem; opacity: 0.7; margin-top: -15px; margin-bottom: 15px;"></p>
+            <p style="margin-bottom: 20px;">You are currently logged in.</p>
+            <button class="btn btn-primary" onclick="handleLogout()">Logout</button>
+            <button class="btn btn-danger" onclick="handleDeleteAccount()">Delete Account</button>
+        </div>
+
         <!-- Sign Up Form -->
         <div class="form-box" id="signup-box">
             <h2>Sign Up</h2>
@@ -217,7 +233,7 @@
         <!-- Login Form -->
         <div class="form-box" id="login-box" style="display: none;">
             <h2>Login</h2>
-            <div class="input-group"><input type="text" id="login-identifier" placeholder="Full Name or Email *"></div>
+            <div class="input-group"><input type="text" id="login-identifier" placeholder="Phone No. or Email *"></div>
             <div class="input-group"><input type="password" id="login-password" placeholder="Password *"></div>
             
             <div class="btn-group">
@@ -264,7 +280,36 @@
             document.getElementById('password').value = '';
         }
 
-        function handleSignUp() {
+        function updateNavUser() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                const displayName = user.fname || "User";
+                const accountLink = document.querySelector('a[href="account.html"]');
+                if (accountLink) {
+                    accountLink.textContent = "Hi " + displayName;
+                }
+                if (document.getElementById('dashboard-box')) {
+                    document.getElementById('dashboard-box').style.display = 'block';
+                    document.getElementById('signup-box').style.display = 'none';
+                    document.getElementById('login-box').style.display = 'none';
+                    document.getElementById('dashboard-welcome').textContent = "Welcome, " + displayName;
+                    
+                    const dateElem = document.getElementById('dashboard-date');
+                    if (user.date) {
+                        const dateObj = new Date(user.date);
+                        dateElem.textContent = "Member since: " + dateObj.toLocaleDateString();
+                    } else {
+                        dateElem.textContent = "Member since: N/A";
+                    }
+                }
+            }
+        }
+        updateNavUser();
+
+        const API_URL = "http://127.0.0.1:3000/api";
+        const SERVER_ROOT = "http://127.0.0.1:3000";
+
+        async function handleSignUp() {
             const fname = document.getElementById('fname').value.trim();
             const lname = document.getElementById('lname').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -280,25 +325,107 @@
                 return;
             }
 
-            const user = { fname, lname, fullname: fname + " " + lname, phone, email, password };
-            let users = JSON.parse(localStorage.getItem('buyit_users')) || [];
-            users.push(user);
-            localStorage.setItem('buyit_users', JSON.stringify(users));
-            alert("Sign Up Successful! Data saved.");
-            clearForm();
+            const user = { fname, lname, fullname: fname + " " + lname, phone, email, password, date: new Date().toISOString() };
+            
+            try {
+                const response = await fetch(`${API_URL}/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert("Sign Up Successful! Please log in.");
+                    clearForm();
+                    showLogin();
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                let errorMessage = "Sign Up Failed: " + error.message;
+                if (error.message.toLowerCase().includes('failed to fetch')) {
+                    errorMessage += "\n\nPlease make sure the Node.js server (server.js) is running.";
+                }
+                alert(errorMessage);
+            }
         }
 
-        function handleLogin() {
+        async function handleLogin() {
             const identifier = document.getElementById('login-identifier').value.trim();
             const password = document.getElementById('login-password').value;
             if (!identifier || !password) { alert("Both fields are mandatory."); return; }
 
-            let users = JSON.parse(localStorage.getItem('buyit_users')) || [];
-            const user = users.find(u => (u.email === identifier || u.fullname === identifier) && u.password === password);
-            
-            if (user) alert("Login Successful! Welcome " + user.fname);
-            else alert("Invalid credentials or user not found.");
+            const loginData = { password };
+            if (identifier.includes('@')) {
+                loginData.email = identifier;
+            } else {
+                loginData.phone = identifier;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.user) {
+                    alert("Login Successful! Welcome " + (data.user.fname || "User"));
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    updateNavUser();
+                    window.location.reload();
+                } else {
+                    alert("Login Failed: " + data.error);
+                }
+            } catch (error) {
+                let errorMessage = "Login Error: " + error.message;
+                if (error.message.toLowerCase().includes('failed to fetch')) {
+                    errorMessage += "\n\nPlease make sure the Node.js server (server.js) is running.";
+                }
+                alert(errorMessage);
+            }
         }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            document.querySelector('a[href="account.html"]').textContent = "ACCOUNT";
+            document.getElementById('dashboard-box').style.display = 'none';
+            document.getElementById('signup-box').style.display = 'block';
+            alert("Logged out successfully!");
+        }
+
+        async function handleDeleteAccount() {
+            if (!confirm("Are you sure you want to delete all data from the database? This cannot be undone.")) return;
+            try {
+                // Call server to clear database
+                await fetch(`${API_URL}/delete-all`, { method: 'POST' });
+                
+                localStorage.removeItem('currentUser');
+                document.querySelector('a[href="account.html"]').textContent = "ACCOUNT";
+                document.getElementById('dashboard-box').style.display = 'none';
+                document.getElementById('signup-box').style.display = 'block';
+                alert("Account deleted and all data removed from database!");
+            } catch (error) {
+                let errorMessage = "Error deleting data: " + error.message;
+                if (error.message.toLowerCase().includes('failed to fetch')) {
+                    errorMessage += "\n\nPlease make sure the Node.js server (server.js) is running.";
+                }
+                alert(errorMessage);
+            }
+        }
+
+        // Check if server is running
+        async function checkServerStatus() {
+            try {
+                await fetch(SERVER_ROOT);
+                document.getElementById('server-status').style.display = 'none';
+            } catch (e) {
+                document.getElementById('server-status').style.display = 'block';
+            }
+        }
+        setInterval(checkServerStatus, 2000); // Check every 2 seconds
+        checkServerStatus();
     </script>
 </body>
 </html>
